@@ -20,8 +20,8 @@
 </tr>
 </table>
 
-<input type="submit" value="Войти" />
-<input type="hidden" name="next" value="{{ next }}" />
+<input type="submit" value="Войти"/>
+<input type="hidden" name="next" value="{% url 'profile' %}"/>
 </form>
 
 {% endblock %}
