@@ -3,6 +3,8 @@ from django import forms
 from django.core.validators import RegexValidator
 from django.contrib.auth import password_validation
 
+from catalog.models import AdvUser
+
 
 class UserRegistrationForm(forms.ModelForm):
     LetterValidator = RegexValidator(r'^[- а-яА-Я]*$')
@@ -14,7 +16,7 @@ class UserRegistrationForm(forms.ModelForm):
     consent = forms.BooleanField(widget=forms.CheckboxInput, required=True, label='Согласие на обработку персональных данных')
 
     class Meta:
-        model = User
+        model = AdvUser
         fields = ('username', 'fullname', 'email', 'password', 'password2', 'consent')
 
     def clean_password2(self):
