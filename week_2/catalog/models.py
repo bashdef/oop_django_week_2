@@ -2,6 +2,15 @@ from django.db import models
 from django.contrib.auth.models import PermissionsMixin, AbstractBaseUser, BaseUserManager
 import datetime
 from django.urls import reverse
+from django.utils import timezone
+from django.core.exceptions import ValidationError
+
+
+def validate_image(fieldfile_obj):
+    filesize = fieldfile_obj.file.size
+    megabyte_limit = 2.0
+    if filesize > megabyte_limit * 1024 * 1024:
+        raise ValidationError("Максимальный размер файла %sMB" % str(megabyte_limit))
 
 
 class CustomAccountManager(BaseUserManager):
@@ -63,14 +72,16 @@ class Category(models.Model):
 class Application(models.Model):
     name = models.CharField(max_length=200, help_text='Введите название заявки')
     summary = models.CharField(max_length=1000, help_text='Введите описание заявки')
-    caterogy = models.ForeignKey('Category', help_text='Выберите категория для заявки', on_delete=models.SET_NULL, null=True)
-    timestamp = models.DateTimeField(default=datetime.date.today())
-    image = models.ImageField(upload_to='application', null=True, blank=True)
+    caterogy = models.ForeignKey('Category', help_text='Выберите категория для заявки', on_delete=models.SET_NULL,
+                                 null=True)
+    timestamp = models.DateTimeField(default=timezone.now())
+    image = models.ImageField(upload_to='images/', validators=[validate_image], help_text='Максимальный размер '
+                                                                                          'изображения 2MB')
 
     application_status = (
-        ('New', 'Новая',),
-        ('Load', 'Принято в работу',),
-        ('Ready', 'Выполнено',)
+        ('Новая', 'Now',),
+        ('Принято в работу', 'Load',),
+        ('Выполнено', 'Ready',)
     )
 
     status = models.CharField(max_length=50, choices=application_status, blank=True, default='Новая')
@@ -80,4 +91,3 @@ class Application(models.Model):
 
     def get_absolute_url(self):
         return reverse('profile')
-

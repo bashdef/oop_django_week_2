@@ -3,17 +3,21 @@ from django import forms
 from django.core.validators import RegexValidator
 from django.contrib.auth import password_validation
 
-from catalog.models import AdvUser
+from catalog.models import AdvUser, Application
+from django.core.exceptions import ValidationError
 
 
 class UserRegistrationForm(forms.ModelForm):
     LetterValidator = RegexValidator(r'^[- а-яА-Я]*$')
     LoginValidator = RegexValidator(r'^[- a-zA-Z]*$')
-    username = forms.CharField(validators=[LoginValidator], required=True, label='Логин', help_text='Только латиница и дефис, уникальный')
-    fullname = forms.CharField(validators=[LetterValidator], required=True, label='ФИО', help_text='Только кириллические буквы, дефис и пробелы')
+    username = forms.CharField(validators=[LoginValidator], required=True, label='Логин',
+                               help_text='Только латиница и дефис, уникальный')
+    fullname = forms.CharField(validators=[LetterValidator], required=True, label='ФИО',
+                               help_text='Только кириллические буквы, дефис и пробелы')
     password = forms.CharField(label='Пароль', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Повторите пароль', widget=forms.PasswordInput)
-    consent = forms.BooleanField(widget=forms.CheckboxInput, required=True, label='Согласие на обработку персональных данных')
+    consent = forms.BooleanField(widget=forms.CheckboxInput, required=True,
+                                 label='Согласие на обработку персональных данных')
 
     class Meta:
         model = AdvUser
@@ -30,3 +34,9 @@ class UserRegistrationForm(forms.ModelForm):
         if password:
             password_validation.validate_password(password)
         return password
+
+
+class ApplicationForm(forms.ModelForm):
+    class Meta:
+        model = Application
+        fields = ['name', 'summary', 'caterogy', 'image', 'status']

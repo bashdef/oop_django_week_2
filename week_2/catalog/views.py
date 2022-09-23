@@ -1,12 +1,13 @@
 from django.shortcuts import render
 from django.views import generic
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from .forms import UserRegistrationForm
+from .forms import UserRegistrationForm, ApplicationForm
 from django.views import generic
 from .models import Application
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
 
 
 # Create your views here.
@@ -32,14 +33,21 @@ def profile(request):
     return render(request, 'catalog/profile.html')
 
 
-class ApplicationListView(generic.ListView):
+class ApplicationList(generic.ListView):
     model = Application
     template_name = 'catalog/application_list.html'
 
     def get_queryset(self):
-        return Application.objects.order_by('status')
+        return Application.objects.filter(status='Новая').order_by('-timestamp')[:4]
 
 
-class ApplicationCreateView(CreateView):
+class ApplicationCreate(CreateView):
     model = Application
-    fields = ['name', 'summary', 'caterogy', 'image']
+    form_class = ApplicationForm
+    template_name = 'application_form.html'
+    success_url = reverse_lazy('application')
+
+
+class ApplicationDelete(DeleteView):
+    model = Application
+    success_url = reverse_lazy('application')

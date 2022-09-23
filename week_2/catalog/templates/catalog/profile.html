@@ -1,4 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-<a href="{% url 'application' %}">Мои заявки</a>
+<ul>
+    <li><a href="{% url 'application' %}">Мои заявки</a></li>
+    <li><a href="{% url 'application-create' %}">Создать заявку</a></li>
+</ul>
 {% endblock %}
