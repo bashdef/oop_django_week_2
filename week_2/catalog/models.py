@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import PermissionsMixin, AbstractBaseUser, BaseUserManager
+import datetime
+from django.urls import reverse
 
 
 class CustomAccountManager(BaseUserManager):
@@ -49,3 +51,33 @@ class AdvUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=200, help_text='Введите категорию заявки')
+
+    def __str__(self):
+        return self.name
+
+
+class Application(models.Model):
+    name = models.CharField(max_length=200, help_text='Введите название заявки')
+    summary = models.CharField(max_length=1000, help_text='Введите описание заявки')
+    caterogy = models.ForeignKey('Category', help_text='Выберите категория для заявки', on_delete=models.SET_NULL, null=True)
+    timestamp = models.DateTimeField(default=datetime.date.today())
+    image = models.ImageField(upload_to='application', null=True, blank=True)
+
+    application_status = (
+        ('New', 'Новая',),
+        ('Load', 'Принято в работу',),
+        ('Ready', 'Выполнено',)
+    )
+
+    status = models.CharField(max_length=50, choices=application_status, blank=True, default='Новая')
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('profile')
+

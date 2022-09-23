@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Мои заявки</h1>
+{% if application_list %}
+    <ul>
+      {% for application in application_list %}
+      <li>
+        {{application.name}} {{application.timestamp}} {{application.summary}} {{application.caterogy}} {{application.status}}
+      </li>
+      {% endfor %}
+        <a href="{% url 'application-create' %}">Создать заявку.</a>
+    </ul>
+    {% else %}
+      <p>Нет заявок.</p>
+        <a href="{% url 'application-create' %}">Создать заявку.</a>
+    {% endif %}
+{% endblock %}

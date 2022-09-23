@@ -4,6 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from .forms import UserRegistrationForm
+from django.views import generic
+from .models import Application
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 
 # Create your views here.
@@ -27,3 +30,16 @@ def register(request):
 @login_required()
 def profile(request):
     return render(request, 'catalog/profile.html')
+
+
+class ApplicationListView(generic.ListView):
+    model = Application
+    template_name = 'catalog/application_list.html'
+
+    def get_queryset(self):
+        return Application.objects.order_by('status')
+
+
+class ApplicationCreateView(CreateView):
+    model = Application
+    fields = ['name', 'summary', 'caterogy', 'image']

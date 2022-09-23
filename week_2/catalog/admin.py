@@ -1,8 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import AdvUser
+from .models import AdvUser, Application, Category
 from django.contrib.auth.models import User
 from .forms import UserRegistrationForm
+
+admin.site.register(Application)
+admin.site.register(Category)
 
 
 class AdvUserAdmin(UserAdmin):

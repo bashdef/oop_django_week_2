@@ -11,7 +11,7 @@ class UserRegistrationForm(forms.ModelForm):
     LoginValidator = RegexValidator(r'^[- a-zA-Z]*$')
     username = forms.CharField(validators=[LoginValidator], required=True, label='Логин', help_text='Только латиница и дефис, уникальный')
     fullname = forms.CharField(validators=[LetterValidator], required=True, label='ФИО', help_text='Только кириллические буквы, дефис и пробелы')
-    password = forms.CharField(label='Пароль', widget=forms.PasswordInput, help_text=password_validation.password_validators_help_text_html())
+    password = forms.CharField(label='Пароль', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Повторите пароль', widget=forms.PasswordInput)
     consent = forms.BooleanField(widget=forms.CheckboxInput, required=True, label='Согласие на обработку персональных данных')
 

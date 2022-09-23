@@ -128,3 +128,7 @@ LOGIN_REDIRECT_URL = '/'
 
 AUTH_USER_MODEL = 'catalog.AdvUser'
 
+MEDIA_ROOT = f'{BASE_DIR}/media'
+
+MEDIA_URL = '/media/'
+
