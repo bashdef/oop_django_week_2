@@ -39,4 +39,4 @@ class UserRegistrationForm(forms.ModelForm):
 class ApplicationForm(forms.ModelForm):
     class Meta:
         model = Application
-        fields = ['name', 'summary', 'caterogy', 'image', 'status']
+        fields = ['name', 'summary', 'caterogy', 'image']
