@@ -44,7 +44,6 @@ class ApplicationForm(forms.ModelForm):
 
 class ApplicationStatusForm(forms.Form):
     new_status = forms.CharField(max_length=50, help_text="Введите новый статус (Принято в работу или выполнено)")
-    image = forms.ImageField(upload_to='images/')
 
     def clean_new_status(self):
         status = self.cleaned_data['new_status']
