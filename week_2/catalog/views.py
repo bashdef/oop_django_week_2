@@ -3,12 +3,14 @@ from django.views import generic
 from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from .forms import UserRegistrationForm, ApplicationForm
+from .forms import UserRegistrationForm, ApplicationForm, ApplicationStatusForm
 from django.views import generic
 from .models import Application, AdvUser
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+from .filters import ApplicationFilter
+from django.shortcuts import get_object_or_404
 
 
 # Create your views here.
@@ -38,8 +40,13 @@ class ApplicationList(LoginRequiredMixin, generic.ListView):
     model = Application
     template_name = 'catalog/application_list.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filter'] = ApplicationFilter(self.request.GET, queryset=self.get_queryset())
+        return context
+
     def get_queryset(self):
-        return Application.objects.filter(client=self.request.user.id).filter(status='Новая').order_by('-timestamp')[:4]
+        return Application.objects.filter(client=self.request.user.id)
 
 
 class ApplicationCreate(CreateView):
@@ -58,3 +65,19 @@ class ApplicationCreate(CreateView):
 class ApplicationDelete(DeleteView):
     model = Application
     success_url = reverse_lazy('application')
+
+
+@permission_required('catalog.change_application')
+def edit_status(request, pk):
+    application_status = get_object_or_404(Application, pk=pk)
+    if request.method == 'POST':
+        form = ApplicationStatusForm(request.POST)
+        if form.is_valid():
+            application_status.status = form.cleaned_data['new_status']
+            application_status.save()
+
+            return HttpResponseRedirect(reverse('application'))
+    else:
+        form = ApplicationStatusForm()
+
+    return render(request, 'catalog/new_status_form.html', {'form': form, 'applicationstatus': application_status})
