@@ -2,6 +2,9 @@
 {% block content %}
 <ul>
     <li><a href="{% url 'application' %}">Мои заявки</a></li>
+    {% if perms.catalog.change_application %}
+    <li><a href="{% url 'application-admin' %}">Заявки всех пользователей</a></li>
+    {% endif %}
     <li><a href="{% url 'application-create' %}">Создать заявку</a></li>
 </ul>
 {% endblock %}

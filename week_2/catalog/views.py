@@ -49,6 +49,16 @@ class ApplicationList(LoginRequiredMixin, generic.ListView):
         return Application.objects.filter(client=self.request.user.id)
 
 
+class ApplicationListAdmin(LoginRequiredMixin, generic.ListView):
+    model = Application
+    template_name = 'catalog/application_list_admin.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filter'] = ApplicationFilter(self.request.GET, queryset=self.get_queryset())
+        return context
+
+
 class ApplicationCreate(CreateView):
     model = Application
     form_class = ApplicationForm
@@ -76,8 +86,9 @@ def edit_status(request, pk):
             application_status.status = form.cleaned_data['new_status']
             application_status.save()
 
-            return HttpResponseRedirect(reverse('application'))
+            return HttpResponseRedirect(reverse('profile'))
     else:
         form = ApplicationStatusForm()
 
     return render(request, 'catalog/new_status_form.html', {'form': form, 'applicationstatus': application_status})
+

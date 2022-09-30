@@ -75,7 +75,7 @@ class Category(models.Model):
 class Application(models.Model):
     name = models.CharField(max_length=200, help_text='Введите название заявки')
     summary = models.CharField(max_length=1000, help_text='Введите описание заявки')
-    caterogy = models.ManyToManyField('Category', help_text='Выберите категория для заявки')
+    category = models.ManyToManyField('Category', help_text='Выберите категория для заявки')
     timestamp = models.DateTimeField(default=timezone.now())
     image = models.ImageField(upload_to='images/', validators=[validate_image], help_text='Максимальный размер '
                                                                                           'изображения 2MB')
