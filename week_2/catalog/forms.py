@@ -42,14 +42,9 @@ class ApplicationForm(forms.ModelForm):
         fields = ['name', 'summary', 'category', 'image']
 
 
-class ApplicationStatusForm(forms.Form):
-    new_status = forms.CharField(max_length=50, help_text="Введите новый статус (Принято в работу или выполнено)")
+class ApplicationStatusForm(forms.ModelForm):
+    comment = forms.CharField(max_length=1000)
 
-    def clean_new_status(self):
-        status = self.cleaned_data['new_status']
-        return status
-
-
-
-
-
+    class Meta:
+        model = Application
+        fields = ['status', 'image', 'comment']

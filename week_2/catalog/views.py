@@ -11,6 +11,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .filters import ApplicationFilter
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
 # Create your views here.
@@ -77,18 +78,29 @@ class ApplicationDelete(DeleteView):
     success_url = reverse_lazy('application')
 
 
-@permission_required('catalog.change_application')
-def edit_status(request, pk):
-    application_status = get_object_or_404(Application, pk=pk)
-    if request.method == 'POST':
-        form = ApplicationStatusForm(request.POST)
-        if form.is_valid():
-            application_status.status = form.cleaned_data['new_status']
-            application_status.save()
+class StatusEdit(PermissionRequiredMixin, UpdateView):
+    permission_required = 'catalog.change_application'
+    model = Application
+    form_class = ApplicationStatusForm
+    template_name = 'new_status_form.html'
+    success_url = reverse_lazy('application-admin')
 
-            return HttpResponseRedirect(reverse('profile'))
-    else:
-        form = ApplicationStatusForm()
-
-    return render(request, 'catalog/new_status_form.html', {'form': form, 'applicationstatus': application_status})
+    def form_valid(self, form):
+        fields = form.save(commit=False)
+        fields.client = self.request.user
+        fields.save()
+        return super().form_valid(form)
+# def edit_status(request, pk):
+#     application_status = get_object_or_404(Application, pk=pk)
+#     if request.method == 'POST':
+#         form = ApplicationStatusForm(request.POST)
+#         if form.is_valid():
+#             application_status.status = form.cleaned_data['new_status']
+#             application_status.save()
+#
+#             return HttpResponseRedirect(reverse('profile'))
+#     else:
+#         form = ApplicationStatusForm()
+#
+#     return render(request, 'catalog/new_status_form.html', {'form': form, 'applicationstatus': application_status})
 
