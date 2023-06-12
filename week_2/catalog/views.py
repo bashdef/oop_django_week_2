@@ -1,11 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import generic
 from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from .forms import UserRegistrationForm, ApplicationForm, ApplicationStatusForm
+from .forms import UserRegistrationForm, ApplicationForm, ApplicationCommentForm, ApplicationDesignForm, CategoryForm
 from django.views import generic
-from .models import Application, AdvUser
+from .models import Application, AdvUser, Category
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -16,7 +16,11 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 
 # Create your views here.
 def home(request):
-    return render(request, 'home.html')
+    num_applications_in_progress = Application.objects.all().filter(status='Принято в работу').count()
+    applications_done = Application.objects.filter(status='Выполнено')
+
+    return render(request, 'home.html', context={'num_applications_in_progress': num_applications_in_progress,
+                                                  'applications_done': applications_done})
 
 
 def register(request):
@@ -78,29 +82,48 @@ class ApplicationDelete(DeleteView):
     success_url = reverse_lazy('application')
 
 
-class StatusEdit(PermissionRequiredMixin, UpdateView):
-    permission_required = 'catalog.change_application'
-    model = Application
-    form_class = ApplicationStatusForm
-    template_name = 'new_status_form.html'
-    success_url = reverse_lazy('application-admin')
+def confirm_update(request, pk, st):
+    newApplication = Application.objects.get(id=pk)
+    newApplication.save()
 
-    def form_valid(self, form):
-        fields = form.save(commit=False)
-        fields.client = self.request.user
-        fields.save()
-        return super().form_valid(form)
-# def edit_status(request, pk):
-#     application_status = get_object_or_404(Application, pk=pk)
-#     if request.method == 'POST':
-#         form = ApplicationStatusForm(request.POST)
-#         if form.is_valid():
-#             application_status.status = form.cleaned_data['new_status']
-#             application_status.save()
-#
-#             return HttpResponseRedirect(reverse('profile'))
-#     else:
-#         form = ApplicationStatusForm()
-#
-#     return render(request, 'catalog/new_status_form.html', {'form': form, 'applicationstatus': application_status})
+    if st == 'Выполнено':
+        if request.method == 'POST':
+            form = ApplicationDesignForm(request.POST, request.FILES)
+            if form.is_valid():
+                newApplication.design = form.cleaned_data['design']
+                newApplication.status = st
+                newApplication.save()
+                return redirect('application-admin')
+        else:
+            form = ApplicationDesignForm()
+        return render(request, 'catalog/update_application.html', {'form': form})
 
+    if st == 'Принято в работу':
+        if request.method == 'POST':
+            form = ApplicationCommentForm(request.POST, request.FILES)
+            if form.is_valid():
+                newApplication.comment = form.cleaned_data['comment']
+                newApplication.status = st
+                newApplication.save()
+                return redirect('application-admin')
+        else:
+            form = ApplicationCommentForm()
+        return render(request, 'catalog/update_application.html', {'form': form})
+
+
+class ViewCategory(LoginRequiredMixin, generic.ListView):
+    model = Category
+    template_name = 'catalog/categories_list.html'
+    context_object_name = 'categories_list'
+
+
+class CreateCategory(CreateView):
+    template_name = 'catalog/category_create.html'
+    model = Category
+    form_class = CategoryForm
+    success_url = reverse_lazy('view-categories')
+
+
+class DeleteCategory(LoginRequiredMixin, DeleteView):
+    model = Category
+    success_url = reverse_lazy('view-categories')

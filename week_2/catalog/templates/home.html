@@ -1,3 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
+<p>Количество заявок, принятых в работу на нашем сайте - {{ num_applications_in_progress }}</p>
+{% for application in applications_done %}
+      {% if forloop.counter <= 4 %}
+        <div class="app_done">
+            <h4>{{ application.name }}</h4>
+            <p>{{ application.category }}</p>
+            <img width="500px" height="300px" src="{{ application.design.url }}">
+            <p>{{ application.timestamp }}</p>
+        </div>
+      {% endif %}
+{% endfor %}
 {% endblock %}

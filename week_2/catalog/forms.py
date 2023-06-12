@@ -3,7 +3,7 @@ from django import forms
 from django.core.validators import RegexValidator
 from django.contrib.auth import password_validation
 
-from catalog.models import AdvUser, Application
+from catalog.models import AdvUser, Application, Category
 from django.core.exceptions import ValidationError
 
 
@@ -42,9 +42,19 @@ class ApplicationForm(forms.ModelForm):
         fields = ['name', 'summary', 'category', 'image']
 
 
-class ApplicationStatusForm(forms.ModelForm):
-    comment = forms.CharField(max_length=1000)
-
+class ApplicationDesignForm(forms.ModelForm):
     class Meta:
         model = Application
-        fields = ['status', 'image', 'comment']
+        fields = ['design']
+
+
+class ApplicationCommentForm(forms.ModelForm):
+    class Meta:
+        model = Application
+        fields = ['comment']
+
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['name']

@@ -75,7 +75,7 @@ class Category(models.Model):
 class Application(models.Model):
     name = models.CharField(max_length=200, help_text='Введите название заявки')
     summary = models.CharField(max_length=1000, help_text='Введите описание заявки')
-    category = models.ManyToManyField('Category', help_text='Выберите категория для заявки')
+    category = models.ForeignKey('Category', help_text='Выберите категория для заявки', on_delete=models.SET_NULL, null=True)
     timestamp = models.DateTimeField(default=timezone.now())
     image = models.ImageField(upload_to='images/', validators=[validate_image], help_text='Максимальный размер '
                                                                                           'изображения 2MB')
@@ -88,7 +88,12 @@ class Application(models.Model):
 
     status = models.CharField(max_length=50, choices=application_status, blank=True, default='Новая')
     client = models.ForeignKey(AdvUser, on_delete=models.SET_NULL, null=True, blank=True, to_field='id')
-
+    comment = models.TextField(max_length=500, blank=True)
+    design = models.ImageField(upload_to='images/',
+                               help_text="Максимальный размер изображения 2MB",
+                               blank=True,
+                               null=True,
+                               validators=[validate_image])
     def __str__(self):
         return self.name
 

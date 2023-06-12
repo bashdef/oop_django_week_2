@@ -2,7 +2,7 @@
 {% load bootstrap %}
 {% block content %}
 {% if perms.catalog.change_application %}
-    <h1>Мои заявки</h1>
+    <h1>Заявки всех пользователей</h1>
     <form action="" method="GET">
         {{ filter.form|bootstrap }}
         <button type="submit" class="btn btn-primary">Показать</button>
@@ -14,7 +14,11 @@
             <li>Описание заявки: {{application.summary}}</li>
             <li>Категория заявки: {{application.category}}</li>
             <li>Временная метка: {{application.timestamp}}</li>
-            <li>Статус заявки: {{application.status}}</li>{% if perms.catalog.change_application %}<a href="{% url 'edit-status' application.pk %}">Сменить статус</a>{% endif %}
+            <li>Статус заявки: {{application.status}}</li>
+             {%if application.status == 'Новая' %}
+                <a href="{% url 'confirm-update' application.pk 'Принято в работу' %}">Статус - принято в работу</a>
+                <a href="{% url 'confirm-update' application.pk  'Выполнено' %}">Статус - выполнено</a>
+            {% endif %}
             <li><a href="{% url 'application-delete' application.pk %}">Удалить заявку</a></li>
             <br>
             <br>
